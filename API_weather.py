@@ -1,5 +1,7 @@
 # GitHub: https://github.com/hwangjh0220/weather-report
 import requests
+import json
+from datetime import datetime
 
 WMO_WEATHER_CODES = {0: "맑음", 1: "대체로 맑음", 2: "주로 맑음", 3: "흐림"}
 
@@ -18,9 +20,14 @@ def fetch_weather_data(lat: float, lon: float):
     }
     return requests.get(url, params=params).json()
 
+def save_to_json(data, city="서울"):
+    filename = f"weather_{city}.json"
+    with open(filename, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    print(f"저장 완료: {filename}")
+
 def format_forecast_display(data, city="서울"):
     daily = data.get("daily", {})
-    hourly = data.get("hourly", {})
     print(f"\n[{city} 날씨 리포트]")
     for i in range(3):
         print(f"🗓️  Day {i+1} ({daily['time'][i]}): 최저 {daily['temperature_2m_min'][i]}℃ / 최고 {daily['temperature_2m_max'][i]}℃")
@@ -28,3 +35,4 @@ def format_forecast_display(data, city="서울"):
 if __name__ == "__main__":
     d = fetch_weather_data(37.5665, 126.9780)
     format_forecast_display(d)
+    save_to_json(d)
